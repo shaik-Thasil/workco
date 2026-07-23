@@ -18,9 +18,10 @@ const CreateArticle = () => {
   // Handle input field changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    // Store the raw value without trimming - allow user to input naturally
     setFormData(prevState => ({
       ...prevState,
-      [name]: value.trim() // Remove leading/trailing whitespace
+      [name]: value
     }));
     // Clear error for this field when user starts typing
     if (errors[name]) {
@@ -35,19 +36,21 @@ const CreateArticle = () => {
   const validateForm = () => {
     const newErrors = {};
 
-    // Validate title
-    if (!formData.title || formData.title.trim() === '') {
+    // Validate title - trim only for validation check
+    const titleValue = formData.title.trim();
+    if (!titleValue || titleValue === '') {
       newErrors.title = 'Title is required';
-    } else if (formData.title.length < 3) {
+    } else if (titleValue.length < 3) {
       newErrors.title = 'Title must be at least 3 characters long';
-    } else if (formData.title.length > 200) {
+    } else if (titleValue.length > 200) {
       newErrors.title = 'Title must not exceed 200 characters';
     }
 
-    // Validate body
-    if (!formData.body || formData.body.trim() === '') {
+    // Validate body - trim only for validation check
+    const bodyValue = formData.body.trim();
+    if (!bodyValue || bodyValue === '') {
       newErrors.body = 'Body is required';
-    } else if (formData.body.length < 10) {
+    } else if (bodyValue.length < 10) {
       newErrors.body = 'Body must be at least 10 characters long';
     }
 
@@ -71,7 +74,7 @@ const CreateArticle = () => {
 
     // Validate form before submitting
     if (!validateForm()) {
-      setAlertMessage('Please check the form errors and try again.');
+      setAlertMessage('Please add title and body.');
       setAlertType('error');
       return;
     }
@@ -80,7 +83,7 @@ const CreateArticle = () => {
     setAlertMessage('');
 
     try {
-      // Prepare the payload
+      // Prepare the payload with trimmed values
       const payload = {
         title: formData.title.trim(),
         body: formData.body.trim(),
@@ -195,7 +198,7 @@ const CreateArticle = () => {
               required
             />
             {errors.title && <span className="error-message">{errors.title}</span>}
-            <span className="char-count">{formData.title.length}/200</span>
+            <span className="char-count">{formData.title.trim().length}/200</span>
           </div>
 
           {/* Body Input */}
@@ -212,7 +215,7 @@ const CreateArticle = () => {
               required
             />
             {errors.body && <span className="error-message">{errors.body}</span>}
-            <span className="char-count">{formData.body.length} characters</span>
+            <span className="char-count">{formData.body.trim().length} characters</span>
           </div>
 
           {/* Tags Input */}
